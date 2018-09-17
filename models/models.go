@@ -4,7 +4,7 @@ import "gopkg.in/mgo.v2/bson"
 
 // Represents a user, use bson keyword to tell mgo driver
 // how to name the properties mongodb document
-type Movie struct {
+type User struct {
 	ID       bson.ObjectId `bson:"_id" json:"id"`
 	Name     string        `bson:"name" json:"name"`
 	Email    string        `bson:"email" json:"email"`
