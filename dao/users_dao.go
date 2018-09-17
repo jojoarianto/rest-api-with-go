@@ -4,9 +4,9 @@ package dao
 import (
 	"log" // to print error log
 
-	. "github.com/jojoarianto/rest-api-go/models" // to import all model (include User)
-	mgo "gopkg.in/mgo.v2"                         // mongo db driver package
-	"gopkg.in/mgo.v2/bson"                        // bson for data structure
+	. "github.com/jojoarianto/rest-api-with-go/models" // to import all model (include User)
+	mgo "gopkg.in/mgo.v2"                              // mongo db driver package
+	"gopkg.in/mgo.v2/bson"                             // bson for data structure
 )
 
 type UsersDAO struct {
@@ -31,7 +31,7 @@ func (m *UsersDAO) Connect() {
 }
 
 // queries method for get all data user
-func (m *UsersDAO) GetAll() ([]User, err) {
+func (m *UsersDAO) GetAll() ([]User, error) {
 	var users []User
 	err := db.C(COLLECTION).Find(bson.M{}).All(&users)
 	return users, err

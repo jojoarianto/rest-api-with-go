@@ -9,11 +9,22 @@ import (
 
 	// gorila mux, router n dispatcher fo go
 	"github.com/gorilla/mux"
+	// import all local project package
+	. "github.com/jojoarianto/rest-api-with-go/config" // construct read to read db config with toml
+	. "github.com/jojoarianto/rest-api-with-go/dao"    // data access object
+	. "github.com/jojoarianto/rest-api-with-go/models" // to import all model (include User)
 )
 
 // method for get all user
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Not Implement!")
+	users, err := dao.GetAll()
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJson(w, http.StatusOK, users)
+
 }
 
 func main() {
