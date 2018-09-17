@@ -1,0 +1,11 @@
+package: github.com/jojoarianto/rest-api-with-go
+import:
+- package: google.golang.org/appengine
+  version: v1.1.0
+  subpackages:
+  - '...'
+- package: github.com/BurntSushi/toml
+  version: v0.3.0
+- package: gopkg.in/mgo.v2
+- package: github.com/gorilla/mux
+  version: v1.6.2
