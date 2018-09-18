@@ -38,7 +38,7 @@ func GetAllUsersEndPoint(w http.ResponseWriter, r *http.Request) {
 func GetUserByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r) // mux library to get all parameters
 	user, err := dao.FindUserById(params["id"])
-	if err != nil {
+	if err != nil { // data not found
 		respondWithError(w, http.StatusBadRequest, "Invalid User ID")
 		return
 	}
@@ -49,12 +49,12 @@ func GetUserByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 func CreateUserEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var user User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil { // not valid data struct
 		respondWithError(w, http.StatusBadRequest, "Invalid Request")
 		return
 	}
 	user.ID = bson.NewObjectId()
-	if err := dao.Insert(user); err != nil {
+	if err := dao.Insert(user); err != nil { // insert to db
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -66,15 +66,30 @@ func CreateUserEndPoint(w http.ResponseWriter, r *http.Request) {
 func UpdateUserEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var user User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil { // invalid data struct
 		respondWithError(w, http.StatusBadRequest, "Invalid Request")
 		return
 	}
-	if err := dao.Update(user); err != nil {
+	if err := dao.Update(user); err != nil { // update to db
 		respondWithError(w, http.StatusInternalServerError, err.Error())
-		fmt.Println(err.Error())
 		return
 	}
+	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
+// method handler to delete existing user
+func DeleteUserEndPoint(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	var user User
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil { // invalid data struct
+		respondWithError(w, http.StatusBadRequest, "Invalid Request")
+		return
+	}
+	if err := dao.Delete(user); err != nil { // delete user
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
 	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
@@ -96,6 +111,7 @@ func main() {
 	r.HandleFunc("/users/{id}", GetUserByIdEndPoint).Methods("GET") // call get method for get spesific user by its id
 	r.HandleFunc("/users", CreateUserEndPoint).Methods("POST")      // call post method to create user
 	r.HandleFunc("/users", UpdateUserEndPoint).Methods("PUT")       // call put method to edit the user
+	r.HandleFunc("/users", DeleteUserEndPoint).Methods("DELETE")    // call delete method to delete the user
 
 	port := ":8000" // port for run the app
 

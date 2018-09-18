@@ -53,6 +53,11 @@ func (m *UsersDAO) Insert(user User) error {
 // query to update data user
 func (m *UsersDAO) Update(user User) error {
 	err := db.C(COLLECTION).UpdateId(user.ID, &user)
-	// db.C(COLLECTION).Update(selector, update)
+	return err
+}
+
+// query for delete user
+func (m *UsersDAO) Delete(user User) error {
+	err := db.C(COLLECTION).Remove(user)
 	return err
 }
