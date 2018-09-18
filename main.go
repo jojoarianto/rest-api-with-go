@@ -14,7 +14,10 @@ import (
 	// import all local project package
 	. "github.com/jojoarianto/rest-api-with-go/config" // construct read to read db config with toml
 	. "github.com/jojoarianto/rest-api-with-go/dao"    // data access object
-	// . "github.com/jojoarianto/rest-api-with-go/models" // to import all model (include User)
+	. "github.com/jojoarianto/rest-api-with-go/models" // to import all model (include User)
+
+	// bson library
+	"gopkg.in/mgo.v2/bson"
 )
 
 var config = Config{}
@@ -45,9 +48,9 @@ func GetUserByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 // method handler create new user
 func CreateUserEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var user user
+	var user User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid Request Payload")
+		respondWithError(w, http.StatusBadRequest, "Invalid Request")
 		return
 	}
 	user.ID = bson.NewObjectId()
