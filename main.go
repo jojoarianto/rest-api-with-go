@@ -21,7 +21,7 @@ var config = Config{}
 var dao = UsersDAO{}
 
 // method handler for get all user
-func GetAllUsers(w http.ResponseWriter, r *http.Request) {
+func GetAllUsersEndPoint(w http.ResponseWriter, r *http.Request) {
 	users, err := dao.GetAll()
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -32,7 +32,7 @@ func GetAllUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 // method handler for get user by id
-func GetUserById(w http.ResponseWriter, r *http.Request) {
+func GetUserByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r) // mux library to get all parameters
 	user, err := dao.FindUserById(params["id"])
 	if err != nil {
@@ -40,6 +40,23 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respondWithJson(w, http.StatusOK, user)
+}
+
+// method handler create new user
+func CreateUserEndPoint(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	var user user
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid Request Payload")
+		return
+	}
+	user.ID = bson.NewObjectId()
+	if err := dao.Insert(user); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJson(w, http.StatusCreated, user)
 }
 
 // init the connection
@@ -56,8 +73,9 @@ func main() {
 	// router with gorilla mux initiate
 	var r = mux.NewRouter()
 
-	r.HandleFunc("/users", GetAllUsers).Methods("GET")      // call get method for get all user
-	r.HandleFunc("/users/{id}", GetUserById).Methods("GET") // call get method for get spesific user by its id
+	r.HandleFunc("/users", GetAllUsersEndPoint).Methods("GET")      // call get method for get all user
+	r.HandleFunc("/users/{id}", GetUserByIdEndPoint).Methods("GET") // call get method for get spesific user by its id
+	r.HandleFunc("/users", CreateUserEndPoint).Methods("POST")      // call post method to create user
 
 	port := ":8000" // port for run the app
 
@@ -77,6 +95,7 @@ func respondWithError(w http.ResponseWriter, code int, msg string) {
 
 // method to print output for http respon
 // parameter  [w (Http.RestponWriter), http.statuscode, payload/data/msg]
+// payload is data credential which will be trans to other part
 func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
 	response, _ := json.Marshal(payload)
 	w.Header().Set("Content-Type", "application/json")

@@ -43,3 +43,9 @@ func (m *UsersDAO) FindUserById(id string) (User, error) {
 	err := db.C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&user) // get one data by id
 	return user, err
 }
+
+// query to post user
+func (m *UsersDAO) Insert(user User) error {
+	err := db.C(COLLECTION).Insert(&user)
+	return err
+}
