@@ -30,9 +30,16 @@ func (m *UsersDAO) Connect() {
 	db = session.DB(m.Database)
 }
 
-// queries method for get all data user
+// queries for get all data user
 func (m *UsersDAO) GetAll() ([]User, error) {
 	var users []User
 	err := db.C(COLLECTION).Find(bson.M{}).All(&users)
 	return users, err
+}
+
+// query for get user by their id
+func (m *UsersDAO) FindUserById(id string) (User, error) {
+	var user User
+	err := db.C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&user) // get one data by id
+	return user, err
 }
