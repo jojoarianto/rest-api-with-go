@@ -62,6 +62,22 @@ func CreateUserEndPoint(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusCreated, user)
 }
 
+// method handler for update existing user
+func UpdateUserEndPoint(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	var user User
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid Request")
+		return
+	}
+	if err := dao.Update(user); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		fmt.Println(err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
 // init the connection
 // Parse the configuration file 'config.toml', and establish a connection to DB
 func init() {
@@ -79,6 +95,7 @@ func main() {
 	r.HandleFunc("/users", GetAllUsersEndPoint).Methods("GET")      // call get method for get all user
 	r.HandleFunc("/users/{id}", GetUserByIdEndPoint).Methods("GET") // call get method for get spesific user by its id
 	r.HandleFunc("/users", CreateUserEndPoint).Methods("POST")      // call post method to create user
+	r.HandleFunc("/users", UpdateUserEndPoint).Methods("PUT")       // call put method to edit the user
 
 	port := ":8000" // port for run the app
 
