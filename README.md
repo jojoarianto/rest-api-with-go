@@ -4,9 +4,16 @@ Simple Rest API with **Go** and **mongoDB**
 The dependency of this REST API is : **github.com/gorilla/mux** mux library, **gopkg.in/mgo.v2** mongoDB driver,  **github.com/BurntSushi/toml** toml parser
 
 ## Installation & Run
-I am using **glide**
+install the dependency
 ```bash
 # Download dependency of project
+go get github.com/gorilla/mux
+go get gopkg.in/mgo.v2
+go github.com/BurntSushi/toml 
+```
+or if you have glide on your local you can use **glide** command
+```bash
+# Download dependency of project via glide
 glide install
 ```
 Build and run main.go 
